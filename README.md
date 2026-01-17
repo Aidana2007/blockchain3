@@ -7,17 +7,6 @@ The goal of this project is to demonstrate real-world smart contract engineering
 
 A modern, user-friendly decentralized application (dApp) for interacting with the STeamToken (STM) ERC-20 smart contract. This frontend provides a complete interface for managing your tokens with real-time updates and comprehensive error handling.
 
-## 📋 Table of Contents
-
-- [Features](#features)
-- [Project Structure](#project-structure)
-- [Prerequisites](#prerequisites)
-- [Installation & Setup](#installation--setup)
-- [Usage](#usage)
-- [Technical Implementation](#technical-implementation)
-- [UX Design Reasoning](#ux-design-reasoning)
-- [Troubleshooting](#troubleshooting)
-
 ## ✨ Features
 
 ### Core Functionality (Part 2 Requirements)
