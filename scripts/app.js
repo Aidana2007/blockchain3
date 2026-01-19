@@ -1,5 +1,3 @@
-// app.js - Main Application Module
-
 import { BlockchainService } from './blockchain.js';
 import { UIManager } from './ui.js';
 import { MarketManager } from './market.js';
