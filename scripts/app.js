@@ -388,8 +388,8 @@ function loadSampleNFTs() {
     addNFTToGrid({ name: 'Butterfly Knife', id: '002', icon: '🔪' }, false);
     addNFTToGrid({ name: 'Phantom Sword', id: '003', icon: '🗡️' }, false);
     
-    addNFTToGrid({ name: 'Dragon Lore', id: '101', icon: '🎨' }, true);
-    addNFTToGrid({ name: 'Golden AK-47', id: '102', icon: '🎨' }, true);
+    // addNFTToGrid({ name: 'Dragon Lore', id: '101', icon: '🎨' }, true);
+    // addNFTToGrid({ name: 'Golden AK-47', id: '102', icon: '🎨' }, true);
 }
 
 loadSampleNFTs();
