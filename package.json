@@ -3,9 +3,35 @@
     "@nomicfoundation/hardhat-toolbox": "^6.1.0",
     "@openzeppelin/contracts": "^5.4.0",
     "hardhat": "^2.28.3",
-    "hardhat-gas-reporter": "^2.3.0"
+    "hardhat-gas-reporter": "^2.3.0",
+    "nodemon": "^3.1.11"
   },
   "dependencies": {
-    "dotenv": "^17.2.3"
-  }
+    "bcryptjs": "^3.0.3",
+    "cors": "^2.8.6",
+    "dotenv": "^17.2.4",
+    "ethers": "^6.16.0",
+    "express": "^5.2.1",
+    "jsonwebtoken": "^9.0.3",
+    "mongoose": "^9.1.6"
+  },
+  "name": "blockchain3",
+  "version": "1.0.0",
+  "description": "A modern, user-friendly decentralized application (dApp) for interacting with the STeamToken (STM) ERC-20 smart contract. This frontend provides a complete interface for managing your tokens with real-time updates and comprehensive error handling.",
+  "main": "hardhat.config.js",
+  "scripts": {
+    "test": "mocha"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Aidana2007/blockchain3.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "bugs": {
+    "url": "https://github.com/Aidana2007/blockchain3/issues"
+  },
+  "homepage": "https://github.com/Aidana2007/blockchain3#readme"
 }

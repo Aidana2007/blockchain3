@@ -1,45 +1,28 @@
-const { ethers } = require("hardhat");
+const hre = require("hardhat");
 
 async function main() {
-  const [deployer] = await ethers.getSigners();
-  console.log("Deploying contracts with the account:", deployer.address);
+  const [deployer] = await hre.ethers.getSigners();
 
-  // 1. Deploy SteamToken (ERC-20)
-  // We pass 1,000,000 as the initial supply
-  const Token = await ethers.getContractFactory("STeamToken");
-  const token = await Token.deploy(1000000);
-  await token.waitForDeployment();
-  const tokenAddress = await token.getAddress();
-  console.log("STeamToken deployed to:", tokenAddress);
+  console.log("Deploying with account:", deployer.address);
 
-  // 2. Deploy Crowdfunding Contract
-  // We pass the token address so it knows which token to give as rewards
-  const Crowdfunding = await ethers.getContractFactory("Crowdfunding");
-  const crowdfunding = await Crowdfunding.deploy(tokenAddress);
+  const SteamToken = await hre.ethers.getContractFactory("STeamToken");
+  const steamToken = await SteamToken.deploy();
+  await steamToken.waitForDeployment();
+
+  console.log("SteamToken deployed to:", await steamToken.getAddress());
+
+  const Crowdfunding = await hre.ethers.getContractFactory("Crowdfunding");
+  const crowdfunding = await Crowdfunding.deploy(await steamToken.getAddress());
   await crowdfunding.waitForDeployment();
-  const crowdfundingAddress = await crowdfunding.getAddress();
-  console.log("Crowdfunding deployed to:", crowdfundingAddress);
 
-  // 3. IMPORTANT: Authorize Crowdfunding to mint reward tokens
-  // This calls the addMinter function we added to SteamToken.sol
-  const addMinterTx = await token.addMinter(crowdfundingAddress);
-  await addMinterTx.wait();
-  console.log("Crowdfunding contract authorized to mint tokens.");
+  console.log("Crowdfunding deployed to:", await crowdfunding.getAddress());
 
-  // 4. Optional: Send some ETH to the contracts so users can sell tokens/NFTs back
-  // This is useful for testing the 'sell' functions immediately
-  const amountToFund = ethers.parseEther("1.0");
-  await deployer.sendTransaction({
-    to: tokenAddress,
-    value: amountToFund
-  });
-  console.log("Funded SteamToken contract with 1 ETH for liquidity.");
+  const tx = await steamToken.setCrowdfundingContract(
+    await crowdfunding.getAddress()
+  );
+  await tx.wait();
 
-  console.log("\n--- DEPLOYMENT COMPLETE ---");
-  console.log("Copy these addresses into your scripts/config.js:");
-  console.log(`export const CONTRACT_ADDRESS = '${tokenAddress}';`);
-  console.log(`export const CROWDFUNDING_ADDRESS = '${crowdfundingAddress}';`);
-  console.log("---------------------------");
+  console.log("Crowdfunding contract set in SteamToken");
 }
 
 main().catch((error) => {

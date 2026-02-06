@@ -2,86 +2,111 @@
 pragma solidity ^0.8.20;
 
 import "./SteamToken.sol";
-import "@openzeppelin/contracts/access/Ownable.sol";
 
-contract Crowdfunding is Ownable {
+contract Crowdfunding {
+    STeamToken public steamToken;
+    address public platformOwner;
+    uint256 public platformFeePercent = 5; 
+
+    uint256 public campaignCount;
+
+    constructor(address _tokenAddress) {
+        steamToken = STeamToken(_tokenAddress);
+        platformOwner = msg.sender;
+    }
+
     struct Campaign {
-        address creator;
         string title;
+        string skinName; 
         uint256 goal;
         uint256 deadline;
-        uint256 currentAmount;
+        uint256 amountRaised;
+        address creator;
         bool finalized;
     }
 
-    STeamToken public rewardToken;
-    address public deployer;
-    uint256 public campaignCount;
     mapping(uint256 => Campaign) public campaigns;
     mapping(uint256 => mapping(address => uint256)) public contributions;
 
-    event CampaignCreated(uint256 indexed campaignId, address creator, string title, uint256 goal, uint256 deadline);
-    event ContributionMade(uint256 indexed campaignId, address contributor, uint256 amount, uint256 fee);
-    event CampaignFinalized(uint256 indexed campaignId, uint256 totalAmount, bool goalReached);
+    event CampaignCreated(
+        uint256 campaignId,
+        string title,
+        string skinName,
+        uint256 goal,
+        uint256 deadline,
+        address creator
+    );
 
-    constructor(address _rewardTokenAddress) Ownable(msg.sender) {
-        rewardToken = STeamToken(payable(_rewardTokenAddress));
-        deployer = msg.sender;
-    }
+    event Funded(uint256 campaignId, address contributor, uint256 amount);
 
-    function createCampaign(string memory _title, uint256 _goal, uint256 _durationInDays) external {
+    event CampaignFinalized(uint256 campaignId);
+
+    function createCampaign(
+        string memory _title,
+        string memory _skinName,
+        uint256 _goal,
+        uint256 _durationInSeconds
+    ) public {
         require(_goal > 0, "Goal must be > 0");
-        require(_durationInDays > 0, "Duration must be > 0");
 
-        uint256 campaignId = campaignCount++;
-        campaigns[campaignId] = Campaign({
-            creator: msg.sender,
+        campaignCount++;
+
+        campaigns[campaignCount] = Campaign({
             title: _title,
+            skinName: _skinName,
             goal: _goal,
-            deadline: block.timestamp + (_durationInDays * 1 days),
-            currentAmount: 0,
+            deadline: block.timestamp + _durationInSeconds,
+            amountRaised: 0,
+            creator: msg.sender,
             finalized: false
         });
 
-        emit CampaignCreated(campaignId, msg.sender, _title, _goal, campaigns[campaignId].deadline);
+        emit CampaignCreated(
+            campaignCount,
+            _title,
+            _skinName,
+            _goal,
+            block.timestamp + _durationInSeconds,
+            msg.sender
+        );
     }
 
-    function contribute(uint256 _campaignId) external payable {
+    function fundCampaign(uint256 _campaignId) public payable {
         Campaign storage campaign = campaigns[_campaignId];
+
         require(block.timestamp < campaign.deadline, "Campaign ended");
-        require(!campaign.finalized, "Campaign finalized");
-        require(msg.value > 0, "Contribution must be > 0");
+        require(msg.value > 0, "Send ETH");
 
-        uint256 fee = msg.value / 100; // 1% fee for deployer
-        uint256 netContribution = msg.value - fee;
+        campaign.amountRaised += msg.value;
+        contributions[_campaignId][msg.sender] += msg.value;
 
-        // Send 1% fee to deployer
-        (bool success, ) = payable(deployer).call{value: fee}("");
-        require(success, "Fee transfer failed");
+        uint256 tokenAmount = msg.value * 1000;
+        steamToken.mint(msg.sender, tokenAmount);
 
-        campaign.currentAmount += netContribution;
-        contributions[_campaignId][msg.sender] += netContribution;
-
-        // Mint reward tokens proportional to contribution
-        uint256 tokenAmount = (netContribution * 10**rewardToken.decimals()) / rewardToken.tokenPrice();
-        rewardToken.mint(msg.sender, tokenAmount);
-
-        emit ContributionMade(_campaignId, msg.sender, netContribution, fee);
+        emit Funded(_campaignId, msg.sender, msg.value);
     }
 
-    function finalizeCampaign(uint256 _campaignId) external {
+    function finalizeCampaign(uint256 _campaignId) public {
         Campaign storage campaign = campaigns[_campaignId];
-        require(block.timestamp >= campaign.deadline || campaign.currentAmount >= campaign.goal, "Cannot finalize yet");
+
+        require(block.timestamp >= campaign.deadline, "Not ended yet");
         require(!campaign.finalized, "Already finalized");
 
         campaign.finalized = true;
-        bool goalReached = campaign.currentAmount >= campaign.goal;
 
-        if (goalReached) {
-            (bool success, ) = payable(campaign.creator).call{value: campaign.currentAmount}("");
-            require(success, "Transfer to creator failed");
-        }
+        uint256 fee = (campaign.amountRaised * platformFeePercent) / 100;
+        uint256 creatorAmount = campaign.amountRaised - fee;
 
-        emit CampaignFinalized(_campaignId, campaign.currentAmount, goalReached);
+        payable(platformOwner).transfer(fee);
+        payable(campaign.creator).transfer(creatorAmount);
+
+        emit CampaignFinalized(_campaignId);
+    }
+
+    function getUserContribution(
+        uint256 _campaignId,
+        address _user
+    ) public view returns (uint256) {
+        return contributions[_campaignId][_user];
     }
 }
