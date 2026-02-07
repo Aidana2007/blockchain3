@@ -5,8 +5,79 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Campaigns - STeam Market</title>
   <link rel="stylesheet" href="style.css" />
+  <style>
+    .nav-bar {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      padding: 1rem 0;
+      margin-bottom: 2rem;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    }
+    .nav-container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 0 2rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 1rem;
+    }
+    .nav-brand {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      color: white;
+      text-decoration: none;
+      font-size: 1.5rem;
+      font-weight: bold;
+    }
+    .nav-links {
+      display: flex;
+      gap: 1.5rem;
+      flex-wrap: wrap;
+      list-style: none;
+      margin: 0;
+      padding: 0;
+    }
+    .nav-links a {
+      color: rgba(255, 255, 255, 0.9);
+      text-decoration: none;
+      padding: 0.5rem 1rem;
+      border-radius: 5px;
+      transition: all 0.3s ease;
+      display: flex;
+      align-items: center;
+      gap: 0.3rem;
+    }
+    .nav-links a:hover {
+      background: rgba(255, 255, 255, 0.1);
+      color: white;
+    }
+    .nav-links a.active {
+      background: rgba(255, 255, 255, 0.2);
+      color: white;
+      font-weight: bold;
+    }
+  </style>
 </head>
 <body>
+  <nav class="nav-bar">
+    <div class="nav-container">
+      <a href="index.html" class="nav-brand">
+        <span>🎮</span>
+        <span>STeam Market</span>
+      </a>
+      <ul class="nav-links">
+        <li><a href="index.html">🏠 Home</a></li>
+        <li><a href="skins.html">🎨 Skins</a></li>
+        <li><a href="campaigns.html" class="active">💰 Campaigns</a></li>
+        <li><a href="create-campaign.html">➕ Create Campaign</a></li>
+        <li><a href="buy-stm.html">💎 Buy STM</a></li>
+        <li><a href="wallet.html">👛 Wallet</a></li>
+      </ul>
+    </div>
+  </nav>
+
   <div class="container">
 
     <div class="card" style="margin-bottom:20px">

@@ -2,12 +2,13 @@ const express = require("express");
 const router = express.Router();
 
 const authMiddleware = require("../middleware/authMiddleware");
+const { dbLimiter, apiLimiter } = require("../middleware/rateLimiter");
 const { createSkin, getSkins, buySkin, getOwnedSkins } = require("../controllers/skinController");
 
-router.post("/", createSkin);
-router.get("/", getSkins);
+router.post("/", dbLimiter, createSkin);
+router.get("/", dbLimiter, getSkins);
 
-router.post("/buy", authMiddleware, buySkin);
-router.get("/owned", authMiddleware, getOwnedSkins);
+router.post("/buy", apiLimiter, authMiddleware, buySkin);
+router.get("/owned", apiLimiter, authMiddleware, getOwnedSkins);
 
 module.exports = router;
