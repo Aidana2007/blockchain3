@@ -22,9 +22,10 @@ exports.login = async (req, res) => {
   const isMatch = await bcrypt.compare(password, user.password);
   if (!isMatch) return res.status(400).json({ msg: "Wrong password" });
 
+  const jwtSecret = process.env.JWT_SECRET || "secretkey";
   const token = jwt.sign(
     { user: { id: user._id } },
-    "secretkey",
+    jwtSecret,
     { expiresIn: "1h" }
   );
 
