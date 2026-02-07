@@ -1,27 +1,21 @@
 const { ethers } = require("ethers");
 const Campaign = require("./models/Campaign");
 const Skin = require("./models/Skin");
+const { 
+  CROWDFUNDING_ABI, 
+  SKIN_PAYMENT_ABI, 
+  getContractAddresses 
+} = require("./config/contracts");
 
 const provider = new ethers.JsonRpcProvider(process.env.RPC_URL);
-const crowdfundingAddress = process.env.CROWDFUNDING_ADDRESS;
-const skinPaymentAddress = process.env.SKIN_PAYMENT_ADDRESS;
-
-// Crowdfunding ABI
-const crowdfundingAbi = [
-  "event CampaignCreated(uint256 id, string title, uint256 goal, uint256 deadline)"
-];
-
-// SkinPayment ABI
-const skinPaymentAbi = [
-  "event SkinPurchased(address indexed buyer, uint256 indexed skinId, uint256 price, uint256 platformFee)"
-];
+const addresses = getContractAddresses();
 
 const listen = () => {
   // Listen to CampaignCreated events
-  if (crowdfundingAddress && crowdfundingAddress !== "") {
+  if (addresses.crowdfunding && addresses.crowdfunding !== "") {
     const crowdfundingContract = new ethers.Contract(
-      crowdfundingAddress,
-      crowdfundingAbi,
+      addresses.crowdfunding,
+      CROWDFUNDING_ABI,
       provider
     );
 
@@ -51,10 +45,10 @@ const listen = () => {
   }
 
   // Listen to SkinPurchased events
-  if (skinPaymentAddress && skinPaymentAddress !== "") {
+  if (addresses.skinPayment && addresses.skinPayment !== "") {
     const skinPaymentContract = new ethers.Contract(
-      skinPaymentAddress,
-      skinPaymentAbi,
+      addresses.skinPayment,
+      SKIN_PAYMENT_ABI,
       provider
     );
 
